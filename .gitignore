@@ -2,3 +2,8 @@ LabelDistill.egg-info/
 ckpts/
 data/
 mmdetection3d/
+outputs/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
