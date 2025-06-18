@@ -2,3 +2,4 @@ LabelDistill.egg-info/
 ckpts/
 data/
 mmdetection3d/
+outputs/
