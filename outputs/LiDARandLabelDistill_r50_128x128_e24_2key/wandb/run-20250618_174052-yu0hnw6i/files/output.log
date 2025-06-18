@@ -1,0 +1,623 @@
+2025-06-18 17:40:53,983 - mmcv - INFO - initialize SECONDFPN with init_cfg [{'type': 'Kaiming', 'layer': 'ConvTranspose2d'}, {'type': 'Constant', 'layer': 'NaiveSyncBatchNorm2d', 'val': 1.0}]
+2025-06-18 17:40:53,992 - mmcv - INFO -
+deblocks.0.0.weight - torch.Size([128, 256, 4, 4]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,992 - mmcv - INFO -
+deblocks.0.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.0.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.1.0.weight - torch.Size([128, 512, 2, 2]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.1.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.1.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.2.0.weight - torch.Size([1024, 128, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.2.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.2.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.3.0.weight - torch.Size([2048, 128, 2, 2]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.3.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:53,993 - mmcv - INFO -
+deblocks.3.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,007 - mmcv - INFO - initialize ResNet with init_cfg {'type': 'Pretrained', 'checkpoint': 'torchvision://resnet50'}
+2025-06-18 17:40:54,007 - mmcv - INFO - load model from: torchvision://resnet50
+2025-06-18 17:40:54,008 - mmcv - INFO - load checkpoint from torchvision path: torchvision://resnet50
+2025-06-18 17:40:54,117 - mmcv - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+2025-06-18 17:40:54,272 - mmcv - INFO - initialize ResNet with init_cfg [{'type': 'Kaiming', 'layer': 'Conv2d'}, {'type': 'Constant', 'val': 1, 'layer': ['_BatchNorm', 'GroupNorm']}]
+2025-06-18 17:40:54,378 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:54,379 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:54,380 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:54,381 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:54,383 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:54,384 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:54,386 - mmcv - INFO -
+conv1.weight - torch.Size([160, 80, 7, 7]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+bn1.weight - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+bn1.bias - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+layer1.0.conv1.weight - torch.Size([160, 160, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+layer1.0.bn1.weight - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+layer1.0.bn1.bias - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+layer1.0.conv2.weight - torch.Size([160, 160, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,387 - mmcv - INFO -
+layer1.0.bn2.weight - torch.Size([160]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.0.bn2.bias - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.1.conv1.weight - torch.Size([160, 160, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.1.bn1.weight - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.1.bn1.bias - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.1.conv2.weight - torch.Size([160, 160, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.1.bn2.weight - torch.Size([160]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer1.1.bn2.bias - torch.Size([160]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer2.0.conv1.weight - torch.Size([320, 160, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer2.0.bn1.weight - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer2.0.bn1.bias - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,388 - mmcv - INFO -
+layer2.0.conv2.weight - torch.Size([320, 320, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.0.bn2.weight - torch.Size([320]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.0.bn2.bias - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.0.downsample.0.weight - torch.Size([320, 160, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.0.downsample.1.weight - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.0.downsample.1.bias - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.1.conv1.weight - torch.Size([320, 320, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.1.bn1.weight - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.1.bn1.bias - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.1.conv2.weight - torch.Size([320, 320, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.1.bn2.weight - torch.Size([320]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer2.1.bn2.bias - torch.Size([320]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer3.0.conv1.weight - torch.Size([640, 320, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,389 - mmcv - INFO -
+layer3.0.bn1.weight - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.bn1.bias - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.conv2.weight - torch.Size([640, 640, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.bn2.weight - torch.Size([640]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.bn2.bias - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.downsample.0.weight - torch.Size([640, 320, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.downsample.1.weight - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.0.downsample.1.bias - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.1.conv1.weight - torch.Size([640, 640, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.1.bn1.weight - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.1.bn1.bias - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.1.conv2.weight - torch.Size([640, 640, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.1.bn2.weight - torch.Size([640]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:54,390 - mmcv - INFO -
+layer3.1.bn2.bias - torch.Size([640]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:54,414 - mmcv - INFO - initialize SECONDFPN with init_cfg [{'type': 'Kaiming', 'layer': 'ConvTranspose2d'}, {'type': 'Constant', 'layer': 'NaiveSyncBatchNorm2d', 'val': 1.0}]
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.0.0.weight - torch.Size([80, 64, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.0.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.0.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.1.0.weight - torch.Size([160, 64, 2, 2]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.1.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.1.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.2.0.weight - torch.Size([320, 64, 4, 4]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.2.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,432 - mmcv - INFO -
+deblocks.2.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,433 - mmcv - INFO -
+deblocks.3.0.weight - torch.Size([640, 64, 8, 8]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,433 - mmcv - INFO -
+deblocks.3.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,433 - mmcv - INFO -
+deblocks.3.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,886 - mmcv - INFO - initialize SECONDFPN with init_cfg [{'type': 'Kaiming', 'layer': 'ConvTranspose2d'}, {'type': 'Constant', 'layer': 'NaiveSyncBatchNorm2d', 'val': 1.0}]
+2025-06-18 17:40:54,895 - mmcv - INFO -
+deblocks.0.0.weight - torch.Size([128, 256, 4, 4]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,895 - mmcv - INFO -
+deblocks.0.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.0.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.1.0.weight - torch.Size([128, 512, 2, 2]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.1.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.1.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.2.0.weight - torch.Size([1024, 128, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.2.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.2.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.3.0.weight - torch.Size([2048, 128, 2, 2]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.3.1.weight - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,896 - mmcv - INFO -
+deblocks.3.1.bias - torch.Size([128]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:54,903 - mmcv - INFO - initialize ResNet with init_cfg {'type': 'Pretrained', 'checkpoint': 'torchvision://resnet50'}
+2025-06-18 17:40:54,904 - mmcv - INFO - load model from: torchvision://resnet50
+2025-06-18 17:40:54,904 - mmcv - INFO - load checkpoint from torchvision path: torchvision://resnet50
+2025-06-18 17:40:55,004 - mmcv - WARNING - The model and loaded state dict do not match exactly
+
+unexpected key in source state_dict: fc.weight, fc.bias
+
+2025-06-18 17:40:55,418 - mmcv - INFO - initialize ResNet with init_cfg [{'type': 'Kaiming', 'layer': 'Conv2d'}, {'type': 'Constant', 'val': 1, 'layer': ['_BatchNorm', 'GroupNorm']}]
+2025-06-18 17:40:55,759 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:55,761 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:55,762 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:55,763 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:55,765 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:55,768 - mmcv - INFO - initialize BasicBlock with init_cfg {'type': 'Constant', 'val': 0, 'override': {'name': 'norm2'}}
+2025-06-18 17:40:55,774 - mmcv - INFO -
+conv1.weight - torch.Size([300, 450, 7, 7]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,774 - mmcv - INFO -
+bn1.weight - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,774 - mmcv - INFO -
+bn1.bias - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.0.conv1.weight - torch.Size([300, 300, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.0.bn1.weight - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.0.bn1.bias - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.0.conv2.weight - torch.Size([300, 300, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.0.bn2.weight - torch.Size([300]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.0.bn2.bias - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.1.conv1.weight - torch.Size([300, 300, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.1.bn1.weight - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.1.bn1.bias - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.1.conv2.weight - torch.Size([300, 300, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.1.bn2.weight - torch.Size([300]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:55,775 - mmcv - INFO -
+layer1.1.bn2.bias - torch.Size([300]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.conv1.weight - torch.Size([600, 300, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.bn1.weight - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.bn1.bias - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.conv2.weight - torch.Size([600, 600, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.bn2.weight - torch.Size([600]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.bn2.bias - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.downsample.0.weight - torch.Size([600, 300, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.downsample.1.weight - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.0.downsample.1.bias - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.1.conv1.weight - torch.Size([600, 600, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.1.bn1.weight - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.1.bn1.bias - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,776 - mmcv - INFO -
+layer2.1.conv2.weight - torch.Size([600, 600, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer2.1.bn2.weight - torch.Size([600]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer2.1.bn2.bias - torch.Size([600]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.conv1.weight - torch.Size([1200, 600, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.bn1.weight - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.bn1.bias - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.conv2.weight - torch.Size([1200, 1200, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.bn2.weight - torch.Size([1200]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.bn2.bias - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.downsample.0.weight - torch.Size([1200, 600, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.downsample.1.weight - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.0.downsample.1.bias - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.1.conv1.weight - torch.Size([1200, 1200, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,777 - mmcv - INFO -
+layer3.1.bn1.weight - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,778 - mmcv - INFO -
+layer3.1.bn1.bias - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,778 - mmcv - INFO -
+layer3.1.conv2.weight - torch.Size([1200, 1200, 3, 3]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,778 - mmcv - INFO -
+layer3.1.bn2.weight - torch.Size([1200]):
+ConstantInit: val=0, bias=0
+
+2025-06-18 17:40:55,778 - mmcv - INFO -
+layer3.1.bn2.bias - torch.Size([1200]):
+The value is the same before and after calling `init_weights` of ResNet
+
+2025-06-18 17:40:55,850 - mmcv - INFO - initialize SECONDFPN with init_cfg [{'type': 'Kaiming', 'layer': 'ConvTranspose2d'}, {'type': 'Constant', 'layer': 'NaiveSyncBatchNorm2d', 'val': 1.0}]
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.0.0.weight - torch.Size([450, 64, 1, 1]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.0.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.0.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.1.0.weight - torch.Size([300, 64, 2, 2]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.1.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.1.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,881 - mmcv - INFO -
+deblocks.2.0.weight - torch.Size([600, 64, 4, 4]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,882 - mmcv - INFO -
+deblocks.2.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,882 - mmcv - INFO -
+deblocks.2.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,882 - mmcv - INFO -
+deblocks.3.0.weight - torch.Size([1200, 64, 8, 8]):
+KaimingInit: a=0, mode=fan_out, nonlinearity=relu, distribution =normal, bias=0
+
+2025-06-18 17:40:55,882 - mmcv - INFO -
+deblocks.3.1.weight - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+2025-06-18 17:40:55,882 - mmcv - INFO -
+deblocks.3.1.bias - torch.Size([64]):
+The value is the same before and after calling `init_weights` of SECONDFPN
+
+Using 16bit native Automatic Mixed Precision (AMP)
+GPU available: True, used: True
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+HPU available: False, using: 0 HPUs
+Global seed set to 0
+Initializing distributed: GLOBAL_RANK: 0, MEMBER: 1/2
+----------------------------------------------------------------------------------------------------
+distributed_backend=nccl
+All distributed processes registered. Starting with 2 processes
+----------------------------------------------------------------------------------------------------
+
+[34m[1mwandb[0m: [33mWARNING[0m The project_name method is deprecated and will be removed in a future release. Please use `run.project` instead.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [2,3]
+
+  | Name  | Type         | Params
+---------------------------------------
+0 | model | LabelDistill | 150 M
+---------------------------------------
+150 M     Trainable params
+9.5 K     Non-trainable params
+150 M     Total params
+300.340   Total estimated model params size (MB)
+Epoch 0:   0%|▎                                                                                                                                                             | 2/879 [00:44<5:22:51, 22.09s/it, loss=5.83e+04, v_num=nw6i]
+/home/byounghun/miniconda/envs/labeldistill/lib/python3.8/site-packages/torch/_tensor.py:575: UserWarning: floor_divide is deprecated, and will be removed in a future version of pytorch. It currently rounds toward 0 (like the 'trunc' function NOT 'floor'). This results in incorrect rounding for negative values.
+To keep the current behavior, use torch.div(a, b, rounding_mode='trunc'), or for actual floor division, use torch.div(a, b, rounding_mode='floor'). (Triggered internally at  /pytorch/aten/src/ATen/native/BinaryOps.cpp:467.)
+  return torch.floor_divide(self, other)
+/home/byounghun/miniconda/envs/labeldistill/lib/python3.8/site-packages/torch/nn/functional.py:718: UserWarning: Named tensors and all their associated APIs are an experimental feature and subject to change. Please do not use them for anything important until they are released as stable. (Triggered internally at  /pytorch/c10/core/TensorImpl.h:1156.)
+  return torch.max_pool2d(input, kernel_size, stride, padding, dilation, ceil_mode)
+/home/byounghun/LabelDistill/labeldistill/layers/heads/kd_head.py:543: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than tensor.new_tensor(sourceTensor).
+  num = torch.clamp(reduce_mean(target_box.new_tensor(num)),
+/home/byounghun/miniconda/envs/labeldistill/lib/python3.8/site-packages/pytorch_lightning/plugins/precision/precision_plugin.py:212: FutureWarning: Non-finite norm encountered in torch.nn.utils.clip_grad_norm_; continuing anyway. Note that the default behavior will change in a future release to error out if a non-finite total norm is encountered. At that point, setting error_if_nonfinite=false will be required to retain the old behavior.
+  torch.nn.utils.clip_grad_norm_(parameters, clip_val)
+/home/byounghun/miniconda/envs/labeldistill/lib/python3.8/site-packages/pytorch_lightning/trainer/trainer.py:727: UserWarning: Detected KeyboardInterrupt, attempting graceful shutdown...
+  rank_zero_warn("Detected KeyboardInterrupt, attempting graceful shutdown...")
+Traceback (most recent call last):
+  File "labeldistill/exps/nuscenes/labeldistill/LabelDistill_r50_128x128_e24_2key.py", line 331, in <module>
+    run_cli(LabelDistillModel,
+KeyboardInterrupt

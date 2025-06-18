@@ -1,0 +1,512 @@
+_wandb:
+    value:
+        cli_version: 0.20.1
+        m:
+            - "1": trainer/global_step
+              "6":
+                - 3
+              "7": []
+        python_version: 3.8.20
+        t:
+            "1":
+                - 1
+                - 5
+                - 9
+                - 37
+                - 38
+                - 41
+                - 53
+                - 60
+            "2":
+                - 1
+                - 5
+                - 9
+                - 37
+                - 38
+                - 41
+                - 53
+                - 60
+            "3":
+                - 7
+                - 13
+                - 55
+                - 66
+            "4": 3.8.20
+            "5": 0.20.1
+            "10":
+                - 22
+            "12": 0.20.1
+            "13": linux-x86_64
+accelerator:
+    value: None
+accumulate_grad_batches:
+    value: None
+amp_backend:
+    value: native
+amp_level:
+    value: None
+auto_lr_find:
+    value: false
+auto_scale_batch_size:
+    value: false
+auto_select_gpus:
+    value: false
+backbone_conf/d_bound:
+    value:
+        - 2
+        - 58
+        - 0.5
+backbone_conf/depth_net_conf/in_channels:
+    value: 512
+backbone_conf/depth_net_conf/mid_channels:
+    value: 512
+backbone_conf/downsample_factor:
+    value: 16
+backbone_conf/final_dim:
+    value:
+        - 256
+        - 704
+backbone_conf/img_backbone_conf/depth:
+    value: 50
+backbone_conf/img_backbone_conf/frozen_stages:
+    value: 0
+backbone_conf/img_backbone_conf/init_cfg/checkpoint:
+    value: torchvision://resnet50
+backbone_conf/img_backbone_conf/init_cfg/type:
+    value: Pretrained
+backbone_conf/img_backbone_conf/norm_eval:
+    value: false
+backbone_conf/img_backbone_conf/out_indices:
+    value:
+        - 0
+        - 1
+        - 2
+        - 3
+backbone_conf/img_backbone_conf/type:
+    value: ResNet
+backbone_conf/img_neck_conf/in_channels:
+    value:
+        - 256
+        - 512
+        - 1024
+        - 2048
+backbone_conf/img_neck_conf/out_channels:
+    value:
+        - 128
+        - 128
+        - 128
+        - 128
+backbone_conf/img_neck_conf/type:
+    value: SECONDFPN
+backbone_conf/img_neck_conf/upsample_strides:
+    value:
+        - 0.25
+        - 0.5
+        - 1
+        - 2
+backbone_conf/output_channels:
+    value: 80
+backbone_conf/x_bound:
+    value:
+        - -51.2
+        - 51.2
+        - 0.8
+backbone_conf/y_bound:
+    value:
+        - -51.2
+        - 51.2
+        - 0.8
+backbone_conf/z_bound:
+    value:
+        - -5
+        - 3
+        - 8
+batch_size_per_device:
+    value: 16
+bda_aug_conf/flip_dx_ratio:
+    value: 0.5
+bda_aug_conf/flip_dy_ratio:
+    value: 0.5
+bda_aug_conf/rot_lim:
+    value:
+        - -22.5
+        - 22.5
+bda_aug_conf/scale_lim:
+    value:
+        - 0.95
+        - 1.05
+benchmark:
+    value: None
+check_val_every_n_epoch:
+    value: 1
+checkpoint_callback:
+    value: None
+ckpt_path:
+    value: None
+class_names:
+    value:
+        - car
+        - truck
+        - construction_vehicle
+        - bus
+        - trailer
+        - barrier
+        - motorcycle
+        - bicycle
+        - pedestrian
+        - traffic_cone
+data_root:
+    value: data/nuScenes
+default_root_dir:
+    value: ./outputs/LiDARandLabelDistill_r50_128x128_e24_2key
+detect_anomaly:
+    value: false
+deterministic:
+    value: false
+devices:
+    value: None
+enable_checkpointing:
+    value: true
+enable_model_summary:
+    value: true
+enable_progress_bar:
+    value: true
+eval_interval:
+    value: 1
+evaluate:
+    value: false
+fast_dev_run:
+    value: false
+flush_logs_every_n_steps:
+    value: None
+gpus:
+    value: 2
+gradient_clip_algorithm:
+    value: None
+gradient_clip_val:
+    value: 5
+head_conf/bbox_coder/code_size:
+    value: 9
+head_conf/bbox_coder/max_num:
+    value: 500
+head_conf/bbox_coder/out_size_factor:
+    value: 4
+head_conf/bbox_coder/pc_range:
+    value:
+        - -51.2
+        - -51.2
+        - -5
+        - 51.2
+        - 51.2
+        - 3
+head_conf/bbox_coder/post_center_range:
+    value:
+        - -61.2
+        - -61.2
+        - -10
+        - 61.2
+        - 61.2
+        - 10
+head_conf/bbox_coder/score_threshold:
+    value: 0.1
+head_conf/bbox_coder/type:
+    value: CenterPointBBoxCoder
+head_conf/bbox_coder/voxel_size:
+    value:
+        - 0.2
+        - 0.2
+        - 8
+head_conf/bev_backbone_conf/base_channels:
+    value: 160
+head_conf/bev_backbone_conf/depth:
+    value: 18
+head_conf/bev_backbone_conf/dilations:
+    value:
+        - 1
+        - 1
+        - 1
+head_conf/bev_backbone_conf/in_channels:
+    value: 80
+head_conf/bev_backbone_conf/norm_eval:
+    value: false
+head_conf/bev_backbone_conf/num_stages:
+    value: 3
+head_conf/bev_backbone_conf/out_indices:
+    value:
+        - 0
+        - 1
+        - 2
+head_conf/bev_backbone_conf/strides:
+    value:
+        - 1
+        - 2
+        - 2
+head_conf/bev_backbone_conf/type:
+    value: ResNet
+head_conf/bev_neck_conf/in_channels:
+    value:
+        - 80
+        - 160
+        - 320
+        - 640
+head_conf/bev_neck_conf/out_channels:
+    value:
+        - 64
+        - 64
+        - 64
+        - 64
+head_conf/bev_neck_conf/type:
+    value: SECONDFPN
+head_conf/bev_neck_conf/upsample_strides:
+    value:
+        - 1
+        - 2
+        - 4
+        - 8
+head_conf/common_heads/dim:
+    value:
+        - 3
+        - 2
+head_conf/common_heads/height:
+    value:
+        - 1
+        - 2
+head_conf/common_heads/reg:
+    value:
+        - 2
+        - 2
+head_conf/common_heads/rot:
+    value:
+        - 2
+        - 2
+head_conf/common_heads/vel:
+    value:
+        - 2
+        - 2
+head_conf/gaussian_overlap:
+    value: 0.1
+head_conf/in_channels:
+    value: 256
+head_conf/loss_bbox/loss_weight:
+    value: 0.25
+head_conf/loss_bbox/reduction:
+    value: mean
+head_conf/loss_bbox/type:
+    value: L1Loss
+head_conf/loss_cls/reduction:
+    value: mean
+head_conf/loss_cls/type:
+    value: GaussianFocalLoss
+head_conf/min_radius:
+    value: 2
+head_conf/tasks:
+    value:
+        - class_names:
+            - car
+          num_class: 1
+        - class_names:
+            - truck
+            - construction_vehicle
+          num_class: 2
+        - class_names:
+            - bus
+            - trailer
+          num_class: 2
+        - class_names:
+            - barrier
+          num_class: 1
+        - class_names:
+            - motorcycle
+            - bicycle
+          num_class: 2
+        - class_names:
+            - pedestrian
+            - traffic_cone
+          num_class: 2
+head_conf/test_cfg/max_per_img:
+    value: 500
+head_conf/test_cfg/max_pool_nms:
+    value: false
+head_conf/test_cfg/min_radius:
+    value:
+        - 4
+        - 12
+        - 10
+        - 1
+        - 0.85
+        - 0.175
+head_conf/test_cfg/nms_thr:
+    value: 0.2
+head_conf/test_cfg/nms_type:
+    value: circle
+head_conf/test_cfg/out_size_factor:
+    value: 4
+head_conf/test_cfg/post_center_limit_range:
+    value:
+        - -61.2
+        - -61.2
+        - -10
+        - 61.2
+        - 61.2
+        - 10
+head_conf/test_cfg/post_max_size:
+    value: 83
+head_conf/test_cfg/pre_max_size:
+    value: 1000
+head_conf/test_cfg/score_threshold:
+    value: 0.1
+head_conf/test_cfg/voxel_size:
+    value:
+        - 0.2
+        - 0.2
+        - 8
+head_conf/train_cfg/code_weights:
+    value:
+        - 1
+        - 1
+        - 1
+        - 1
+        - 1
+        - 1
+        - 1
+        - 1
+        - 0.5
+        - 0.5
+head_conf/train_cfg/dense_reg:
+    value: 1
+head_conf/train_cfg/gaussian_overlap:
+    value: 0.1
+head_conf/train_cfg/grid_size:
+    value:
+        - 512
+        - 512
+        - 1
+head_conf/train_cfg/max_objs:
+    value: 500
+head_conf/train_cfg/min_radius:
+    value: 2
+head_conf/train_cfg/out_size_factor:
+    value: 4
+head_conf/train_cfg/point_cloud_range:
+    value:
+        - -51.2
+        - -51.2
+        - -5
+        - 51.2
+        - 51.2
+        - 3
+head_conf/train_cfg/voxel_size:
+    value:
+        - 0.2
+        - 0.2
+        - 8
+ida_aug_conf/H:
+    value: 900
+ida_aug_conf/Ncams:
+    value: 6
+ida_aug_conf/W:
+    value: 1600
+ida_aug_conf/bot_pct_lim:
+    value:
+        - 0
+        - 0
+ida_aug_conf/cams:
+    value:
+        - CAM_FRONT_LEFT
+        - CAM_FRONT
+        - CAM_FRONT_RIGHT
+        - CAM_BACK_LEFT
+        - CAM_BACK
+        - CAM_BACK_RIGHT
+ida_aug_conf/final_dim:
+    value:
+        - 256
+        - 704
+ida_aug_conf/rand_flip:
+    value: true
+ida_aug_conf/resize_lim:
+    value:
+        - 0.386
+        - 0.55
+ida_aug_conf/rot_lim:
+    value:
+        - -5.4
+        - 5.4
+ipus:
+    value: None
+limit_predict_batches:
+    value: None
+limit_test_batches:
+    value: None
+limit_train_batches:
+    value: None
+limit_val_batches:
+    value: 0
+log_every_n_steps:
+    value: 50
+log_gpu_memory:
+    value: None
+logger:
+    value: true
+max_epochs:
+    value: 24
+max_steps:
+    value: -1
+max_time:
+    value: None
+min_epochs:
+    value: None
+min_steps:
+    value: None
+move_metrics_to_cpu:
+    value: false
+multiple_trainloader_mode:
+    value: max_size_cycle
+num_nodes:
+    value: 1
+num_processes:
+    value: None
+num_sanity_val_steps:
+    value: 0
+overfit_batches:
+    value: 0
+plugins:
+    value: None
+precision:
+    value: 16
+predict:
+    value: false
+prepare_data_per_node:
+    value: None
+process_position:
+    value: 0
+profiler:
+    value: simple
+progress_bar_refresh_rate:
+    value: None
+reload_dataloaders_every_n_epochs:
+    value: 0
+replace_sampler_ddp:
+    value: true
+resume_from_checkpoint:
+    value: None
+seed:
+    value: 0
+stochastic_weight_avg:
+    value: false
+strategy:
+    value: ddp
+sync_batchnorm:
+    value: false
+terminate_on_nan:
+    value: None
+tpu_cores:
+    value: None
+track_grad_norm:
+    value: -1
+val_check_interval:
+    value: None
+weights_save_path:
+    value: None
+weights_summary:
+    value: top

@@ -3,12 +3,13 @@ import os
 from argparse import ArgumentParser
 
 import pytorch_lightning as pl
+from pytorch_lightning.loggers import WandbLogger
 
 from labeldistill.callbacks.ema import EMACallback
 from labeldistill.utils.torch_dist import all_gather_object, synchronize
 
 from .nuscenes.base_exp import LabelDistillModel
-
+from datetime import datetime
 
 def run_cli(model_class=LabelDistillModel,
             exp_name='base_exp',
@@ -47,14 +48,25 @@ def run_cli(model_class=LabelDistillModel,
     if args.seed is not None:
         pl.seed_everything(args.seed)
 
+    now = datetime.now()
+    current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    wandb_logger = WandbLogger(
+        name='master_' + exp_name + '_' + current_time,
+        project="LabelDistill",
+        save_dir=os.path.join('./outputs/', exp_name),
+        log_model=True
+    )
+
     model = model_class(**vars(args))
+
     if use_ema:
         train_dataloader = model.train_dataloader()
         ema_callback = EMACallback(
             len(train_dataloader.dataset) * args.max_epochs)
-        trainer = pl.Trainer.from_argparse_args(args, callbacks=[ema_callback])
+        trainer = pl.Trainer.from_argparse_args(args, logger=wandb_logger, callbacks=[ema_callback])
     else:
-        trainer = pl.Trainer.from_argparse_args(args)
+        trainer = pl.Trainer.from_argparse_args(args, logger=wandb_logger)
+
     if args.evaluate:
         trainer.test(model, ckpt_path=args.ckpt_path)
     elif args.predict:

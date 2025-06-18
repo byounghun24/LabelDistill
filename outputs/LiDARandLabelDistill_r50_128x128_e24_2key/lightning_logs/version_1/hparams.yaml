@@ -1,0 +1,328 @@
+accelerator: null
+accumulate_grad_batches: null
+amp_backend: native
+amp_level: null
+auto_lr_find: false
+auto_scale_batch_size: false
+auto_select_gpus: false
+backbone_conf:
+  d_bound:
+  - 2.0
+  - 58.0
+  - 0.5
+  depth_net_conf:
+    in_channels: 512
+    mid_channels: 512
+  downsample_factor: 16
+  final_dim: &id002 !!python/tuple
+  - 256
+  - 704
+  img_backbone_conf:
+    depth: 50
+    frozen_stages: 0
+    init_cfg:
+      checkpoint: torchvision://resnet50
+      type: Pretrained
+    norm_eval: false
+    out_indices:
+    - 0
+    - 1
+    - 2
+    - 3
+    type: ResNet
+  img_neck_conf:
+    in_channels:
+    - 256
+    - 512
+    - 1024
+    - 2048
+    out_channels:
+    - 128
+    - 128
+    - 128
+    - 128
+    type: SECONDFPN
+    upsample_strides:
+    - 0.25
+    - 0.5
+    - 1
+    - 2
+  output_channels: 80
+  x_bound:
+  - -51.2
+  - 51.2
+  - 0.8
+  y_bound:
+  - -51.2
+  - 51.2
+  - 0.8
+  z_bound:
+  - -5
+  - 3
+  - 8
+batch_size_per_device: 4
+bda_aug_conf:
+  flip_dx_ratio: 0.5
+  flip_dy_ratio: 0.5
+  rot_lim: !!python/tuple
+  - -22.5
+  - 22.5
+  scale_lim: !!python/tuple
+  - 0.95
+  - 1.05
+benchmark: null
+check_val_every_n_epoch: 1
+checkpoint_callback: null
+ckpt_path: null
+class_names:
+- car
+- truck
+- construction_vehicle
+- bus
+- trailer
+- barrier
+- motorcycle
+- bicycle
+- pedestrian
+- traffic_cone
+data_root: data/nuScenes
+default_root_dir: ./outputs/LiDARandLabelDistill_r50_128x128_e24_2key
+detect_anomaly: false
+deterministic: false
+devices: null
+enable_checkpointing: true
+enable_model_summary: true
+enable_progress_bar: true
+eval_interval: 1
+evaluate: false
+fast_dev_run: false
+flush_logs_every_n_steps: null
+gpus: 1
+gradient_clip_algorithm: null
+gradient_clip_val: 5
+head_conf:
+  bbox_coder:
+    code_size: 9
+    max_num: 500
+    out_size_factor: 4
+    pc_range:
+    - -51.2
+    - -51.2
+    - -5
+    - 51.2
+    - 51.2
+    - 3
+    post_center_range:
+    - -61.2
+    - -61.2
+    - -10.0
+    - 61.2
+    - 61.2
+    - 10.0
+    score_threshold: 0.1
+    type: CenterPointBBoxCoder
+    voxel_size:
+    - 0.2
+    - 0.2
+    - 8
+  bev_backbone_conf:
+    base_channels: 160
+    depth: 18
+    dilations: !!python/tuple
+    - 1
+    - 1
+    - 1
+    in_channels: 80
+    norm_eval: false
+    num_stages: 3
+    out_indices:
+    - 0
+    - 1
+    - 2
+    strides: !!python/tuple
+    - 1
+    - 2
+    - 2
+    type: ResNet
+  bev_neck_conf:
+    in_channels:
+    - 80
+    - 160
+    - 320
+    - 640
+    out_channels:
+    - 64
+    - 64
+    - 64
+    - 64
+    type: SECONDFPN
+    upsample_strides:
+    - 1
+    - 2
+    - 4
+    - 8
+  common_heads:
+    dim: !!python/tuple
+    - 3
+    - 2
+    height: !!python/tuple
+    - 1
+    - 2
+    reg: &id001 !!python/tuple
+    - 2
+    - 2
+    rot: *id001
+    vel: *id001
+  gaussian_overlap: 0.1
+  in_channels: 256
+  loss_bbox:
+    loss_weight: 0.25
+    reduction: mean
+    type: L1Loss
+  loss_cls:
+    reduction: mean
+    type: GaussianFocalLoss
+  min_radius: 2
+  tasks:
+  - class_names:
+    - car
+    num_class: 1
+  - class_names:
+    - truck
+    - construction_vehicle
+    num_class: 2
+  - class_names:
+    - bus
+    - trailer
+    num_class: 2
+  - class_names:
+    - barrier
+    num_class: 1
+  - class_names:
+    - motorcycle
+    - bicycle
+    num_class: 2
+  - class_names:
+    - pedestrian
+    - traffic_cone
+    num_class: 2
+  test_cfg:
+    max_per_img: 500
+    max_pool_nms: false
+    min_radius:
+    - 4
+    - 12
+    - 10
+    - 1
+    - 0.85
+    - 0.175
+    nms_thr: 0.2
+    nms_type: circle
+    out_size_factor: 4
+    post_center_limit_range:
+    - -61.2
+    - -61.2
+    - -10.0
+    - 61.2
+    - 61.2
+    - 10.0
+    post_max_size: 83
+    pre_max_size: 1000
+    score_threshold: 0.1
+    voxel_size:
+    - 0.2
+    - 0.2
+    - 8
+  train_cfg:
+    code_weights:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 0.5
+    - 0.5
+    dense_reg: 1
+    gaussian_overlap: 0.1
+    grid_size:
+    - 512
+    - 512
+    - 1
+    max_objs: 500
+    min_radius: 2
+    out_size_factor: 4
+    point_cloud_range:
+    - -51.2
+    - -51.2
+    - -5
+    - 51.2
+    - 51.2
+    - 3
+    voxel_size:
+    - 0.2
+    - 0.2
+    - 8
+ida_aug_conf:
+  H: 900
+  Ncams: 6
+  W: 1600
+  bot_pct_lim: !!python/tuple
+  - 0.0
+  - 0.0
+  cams:
+  - CAM_FRONT_LEFT
+  - CAM_FRONT
+  - CAM_FRONT_RIGHT
+  - CAM_BACK_LEFT
+  - CAM_BACK
+  - CAM_BACK_RIGHT
+  final_dim: *id002
+  rand_flip: true
+  resize_lim: !!python/tuple
+  - 0.386
+  - 0.55
+  rot_lim: !!python/tuple
+  - -5.4
+  - 5.4
+ipus: null
+limit_predict_batches: null
+limit_test_batches: null
+limit_train_batches: null
+limit_val_batches: 0
+log_every_n_steps: 50
+log_gpu_memory: null
+logger: true
+max_epochs: 24
+max_steps: -1
+max_time: null
+min_epochs: null
+min_steps: null
+move_metrics_to_cpu: false
+multiple_trainloader_mode: max_size_cycle
+num_nodes: 1
+num_processes: null
+num_sanity_val_steps: 0
+overfit_batches: 0.0
+plugins: null
+precision: 16
+predict: false
+prepare_data_per_node: null
+process_position: 0
+profiler: simple
+progress_bar_refresh_rate: null
+reload_dataloaders_every_n_epochs: 0
+replace_sampler_ddp: true
+resume_from_checkpoint: null
+seed: 0
+stochastic_weight_avg: false
+strategy: ddp
+sync_batchnorm: false
+terminate_on_nan: null
+tpu_cores: null
+track_grad_norm: -1
+val_check_interval: null
+weights_save_path: null
+weights_summary: top
