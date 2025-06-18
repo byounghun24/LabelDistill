@@ -1,7 +1,0 @@
-{"time":"2025-06-18T17:43:38.064855618+09:00","level":"INFO","msg":"stream: starting","core version":"0.20.1","symlink path":"outputs/LiDARandLabelDistill_r50_128x128_e24_2key/wandb/run-20250618_174337-w0wn5jff/logs/debug-core.log"}
-{"time":"2025-06-18T17:43:38.741828205+09:00","level":"INFO","msg":"stream: created new stream","id":"w0wn5jff"}
-{"time":"2025-06-18T17:43:38.741910434+09:00","level":"INFO","msg":"stream: started","id":"w0wn5jff"}
-{"time":"2025-06-18T17:43:38.743805333+09:00","level":"INFO","msg":"handler: started","stream_id":"w0wn5jff"}
-{"time":"2025-06-18T17:43:38.744127595+09:00","level":"INFO","msg":"sender: started","stream_id":"w0wn5jff"}
-{"time":"2025-06-18T17:43:38.744342454+09:00","level":"INFO","msg":"writer: Do: started","stream_id":"w0wn5jff"}
-{"time":"2025-06-18T17:43:39.480209939+09:00","level":"INFO","msg":"Starting system monitor"}
