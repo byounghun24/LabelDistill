@@ -131,11 +131,11 @@ class KDHead(CenterHead):
             loss_bbox=loss_bbox,
             separate_head=separate_head,
         )
-        self.trunk = build_backbone(bev_backbone_conf)
-        self.trunk.init_weights()
+        # self.trunk = build_backbone(bev_backbone_conf)
+        # self.trunk.init_weights()
         self.neck = build_neck(bev_neck_conf)
         self.neck.init_weights()
-        del self.trunk.maxpool
+        # del self.trunk.maxpool
         self.gaussian_overlap = gaussian_overlap
         self.min_radius = min_radius
         self.train_cfg = train_cfg
@@ -152,23 +152,24 @@ class KDHead(CenterHead):
         Returns:
             tuple(list[dict]): Output results for tasks.
         """
-        x = x.float()
-        # FPN
-        trunk_outs = [x]
-        if self.trunk.deep_stem:
-            x = self.trunk.stem(x)
-        else:
-            x = self.trunk.conv1(x)
-            x = self.trunk.norm1(x)
-            x = self.trunk.relu(x)
-        for i, layer_name in enumerate(self.trunk.res_layers):
-            res_layer = getattr(self.trunk, layer_name)
-            x = res_layer(x)
-            if i in self.trunk.out_indices:
-                trunk_outs.append(x)
-        fpn_output = self.neck(trunk_outs)
+        x = [i.float() for i in x]
+        # x = x.float()
+        # # FPN
+        # trunk_outs = [x]
+        # if self.trunk.deep_stem:
+        #     x = self.trunk.stem(x)
+        # else:
+        #     x = self.trunk.conv1(x)
+        #     x = self.trunk.norm1(x)
+        #     x = self.trunk.relu(x)
+        # for i, layer_name in enumerate(self.trunk.res_layers):
+        #     res_layer = getattr(self.trunk, layer_name)
+        #     x = res_layer(x)
+        #     if i in self.trunk.out_indices:
+        #         trunk_outs.append(x)
+        fpn_output = self.neck(x)
         ret_values = super().forward(fpn_output)
-        return ret_values, trunk_outs[:2]
+        return ret_values
 
     def get_targets(self, gt_bboxes_3d, gt_labels_3d):
         """Generate targets.

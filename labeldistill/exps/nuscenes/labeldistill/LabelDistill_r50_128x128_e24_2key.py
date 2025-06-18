@@ -189,7 +189,7 @@ class LabelDistillModel(BaseLabelDistillModel):
             feature_size=128
         )
 
-        le_ckpt_path='./outputs/LabelDistill_step1/lightning_logs/version_0/11.pth'
+        le_ckpt_path='./ckpts/label_encoder_pretrained.pth'
         #############################################################################################
 
         self.model = LabelDistill(self.backbone_conf,

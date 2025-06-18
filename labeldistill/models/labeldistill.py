@@ -5,6 +5,7 @@ from labeldistill.layers.backbones.adaptor import DistillAdaptor
 from labeldistill.layers.backbones.label_backbone import LabelBackbone
 
 from labeldistill.layers.heads.kd_head import KDHead
+from labeldistill.layers.heads.kd_fpn import KDFPN
 from mmdet3d.models import build_detector
 import torch
 
@@ -35,6 +36,8 @@ class LabelDistill(nn.Module):
                  ):
         super(LabelDistill, self).__init__()
         self.backbone = BaseLSSFPN(**backbone_conf)
+        self.kdfpn = KDFPN(**head_conf)
+        self.fusion = SimpleFusion(150, 100)
         self.head = KDHead(**head_conf)
         self.is_train_depth = is_train_depth
 
@@ -126,16 +129,23 @@ class LabelDistill(nn.Module):
                 lidar_feats = self.centerpoint.pts_neck(lidar_feats)
                 lidar_preds = self.centerpoint.pts_bbox_head(lidar_feats)
 
-            preds, backbone_out = self.head(x) #backbone output list of [B, C, W, H]
+            after_fpn_all = self.kdfpn(x)
+            after_fpn = after_fpn_all[:2]
 
-            c1 = backbone_out[0].shape[1] // 3
-            c2 = backbone_out[1].shape[1] // 3
+            c1 = after_fpn[0].shape[1] // 3
+            c2 = after_fpn[1].shape[1] // 3
+
+            after_fusion_large, after_fusion_small, label_feats_large, label_feats_small, lidar_feats_large, lidar_feats_small = self.fusion(after_fpn, c1, c2)
+
+            after_fusion = [after_fusion_large, after_fusion_small, after_fpn_all[2], after_fpn_all[3]]
 
             #adaptor
-            distill_feats_label = self.distill_encoder_label([backbone_out[0][:, :c1],
-                                                              backbone_out[1][:, :c2]])
-            distill_feats_lidar = self.distill_encoder_lidar([backbone_out[0][:, c1:c1*2],
-                                                              backbone_out[1][:, c2:c2*2]])
+            distill_feats_label = self.distill_encoder_label([label_feats_large,
+                                                              label_feats_small])
+            distill_feats_lidar = self.distill_encoder_lidar([lidar_feats_large,
+                                                              lidar_feats_small])
+            
+            preds = self.head(after_fusion) #backbone output list of [B, C, W, H]
 
             return preds, lidar_preds, depth_pred, distill_feats_lidar, lidar_feats_out, distill_feats_label, label_feats
         else:
@@ -202,3 +212,45 @@ class LabelDistill(nn.Module):
             list[dict]: Decoded bbox, scores and labels after nms.
         """
         return self.head.get_bboxes(preds_dicts, img_metas, img, rescale)
+
+
+class SimpleFusion(nn.Module):
+    def __init__(self, c1, c2):
+        super().__init__()
+
+        def make_fusion_block(ch):
+            return nn.Sequential(
+                nn.Conv2d(ch, ch, kernel_size=1),
+                nn.BatchNorm2d(ch),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(ch, ch, kernel_size=1),
+                nn.BatchNorm2d(ch),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(ch, ch, kernel_size=1),
+                nn.BatchNorm2d(ch),
+                nn.ReLU(inplace=True),
+            )
+
+        self.fuse_large = make_fusion_block(c1 * 3)
+        self.fuse_small = make_fusion_block(c2 * 3)
+
+    def forward(self, after_fpn, c1, c2):
+        # Split modalities
+        label_feats_large = after_fpn[0][:, :c1]
+        label_feats_small = after_fpn[1][:, :c2]
+
+        lidar_feats_large = after_fpn[0][:, c1:c1*2]
+        lidar_feats_small = after_fpn[1][:, c2:c2*2]
+
+        camera_feats_large = after_fpn[0][:, c1*2:]
+        camera_feats_small = after_fpn[1][:, c2*2:]
+
+        # Concatenate: [label | lidar | camera] along channel dim
+        large_concat = torch.cat([label_feats_large, lidar_feats_large, camera_feats_large], dim=1)
+        small_concat = torch.cat([label_feats_small, lidar_feats_small, camera_feats_small], dim=1)
+
+        # Fusion
+        fused_large = self.fuse_large(large_concat)
+        fused_small = self.fuse_small(small_concat)
+
+        return fused_large, fused_small, label_feats_large, label_feats_small, lidar_feats_large, lidar_feats_small
