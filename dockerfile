@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Seoul
 
 RUN apt-get update && apt-get install -y \
-    bash sudo wget bzip2 git curl ca-certificates libx11-6 libgl1 libglib2.0-0 tzdata \
+    bash sudo wget bzip2 git curl ca-certificates libx11-6 libgl1 libglib2.0-0 tzdata tmux \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
     && rm -rf /var/lib/apt/lists/*
 
@@ -59,6 +59,10 @@ RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
 # Install pip
 RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
     pip install pip==24.0
+
+# Install wandb
+RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
+    pip install wandb
 
 # Install project dependencies
 RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
