@@ -8,6 +8,7 @@ import numpy as np
 import pyquaternion
 from nuscenes.utils.data_classes import Box
 from pyquaternion import Quaternion
+import wandb
 
 __all__ = ['DetNuscEvaluator']
 
@@ -114,6 +115,10 @@ class DetNuscEvaluator():
 
         detail['{}/NDS'.format(metric_prefix)] = metrics['nd_score']
         detail['{}/mAP'.format(metric_prefix)] = metrics['mean_ap']
+
+        if wandb.run is not None:
+            wandb.log(detail)
+            
         return detail
 
     def format_results(self,
