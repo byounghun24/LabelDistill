@@ -78,7 +78,8 @@ class DetNuscEvaluator():
             dict: Dictionary of evaluation details.
         """
         from nuscenes import NuScenes
-        from nuscenes.eval.detection.evaluate import NuScenesEval
+        # from nuscenes.eval.detection.evaluate import NuScenesEval
+        from labeldistill.evaluators.custom_evaluate import NuScenesEval
 
         output_dir = osp.join(*osp.split(result_path)[:-1])
         nusc = NuScenes(version=self.version,
@@ -115,7 +116,6 @@ class DetNuscEvaluator():
 
         detail['{}/NDS'.format(metric_prefix)] = metrics['nd_score']
         detail['{}/mAP'.format(metric_prefix)] = metrics['mean_ap']
-        print(detail)
         if wandb.run is not None:
             wandb.log(detail)
             
