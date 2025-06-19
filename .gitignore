@@ -3,3 +3,8 @@ ckpts/
 data/
 mmdetection3d/
 outputs/
+
+# Python bytecode
+__pycache__/
+*.pyc[cod]
+

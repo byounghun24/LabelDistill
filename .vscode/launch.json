@@ -5,15 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/byounghun/workspace/LabelDistill/labeldistill/exps/nuscenes/labeldistill/LabelDistill_r50_128x128_e24_4key.py",
+            "cwd": "/home/byounghun/workspace/LabelDistill",
+            "console": "integratedTerminal",
+            "args": [
+                "--amp_backend", "native",
+                "-b", "1",
+                "--gpus", "1"
+            ],
+        },
+        {
             "name": "val",
             "type": "debugpy",
             "request": "launch",
-            "program": "/home/byounghun/LabelDistill/labeldistill/exps/nuscenes/labeldistill/LabelDistill_r50_128x128_e24_4key.py",
-            "cwd": "/home/byounghun/LabelDistill",
+            "program": "/home/byounghun/workspace/LabelDistill/labeldistill/exps/nuscenes/labeldistill/LabelDistill_r50_128x128_e24_4key.py",
+            "cwd": "/home/byounghun/workspace/LabelDistill",
             "console": "integratedTerminal",
-            "env": {
-                "CUDA_VISIBLE_DEVICES": "3"
-            },
             "args": [
                 "--ckpt_path", "./ckpts/LabelDistill_r50_128x128.pth",
                 "-e", 
