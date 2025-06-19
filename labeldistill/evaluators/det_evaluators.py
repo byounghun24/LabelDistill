@@ -115,7 +115,7 @@ class DetNuscEvaluator():
 
         detail['{}/NDS'.format(metric_prefix)] = metrics['nd_score']
         detail['{}/mAP'.format(metric_prefix)] = metrics['mean_ap']
-
+        print(detail)
         if wandb.run is not None:
             wandb.log(detail)
             
