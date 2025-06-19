@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/byounghun/workspace/LabelDistill/labeldistill/exps/nuscenes/labeldistill/LabelDistill_r50_128x128_e24_4key.py",
+            "cwd": "/home/byounghun/workspace/LabelDistill",
+            "console": "integratedTerminal",
+            "args": [
+                "--amp_backend", "native",
+                "-b", "1",
+                "--gpus", "1"
+            ],
+        },
+        {
+            "name": "val",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/byounghun/workspace/LabelDistill/labeldistill/exps/nuscenes/labeldistill/LabelDistill_r50_128x128_e24_4key.py",
+            "cwd": "/home/byounghun/workspace/LabelDistill",
+            "console": "integratedTerminal",
+            "args": [
+                "--ckpt_path", "./ckpts/LabelDistill_r50_128x128.pth",
+                "-e", 
+                "-b", "1",
+                "--gpus", "1"
+            ],
+        },
+    ]
+}
