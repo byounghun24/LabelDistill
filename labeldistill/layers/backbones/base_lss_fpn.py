@@ -421,6 +421,43 @@ class BaseLSSFPN(nn.Module):
         frustum = torch.stack((x_coords, y_coords, d_coords, paddings), -1)
         return frustum
 
+    # def get_geometry(self, sensor2ego_mat, intrin_mat, ida_mat, bda_mat):
+    #     """Transfer points from camera coord to ego coord.
+
+    #     Args:
+    #         rots(Tensor): Rotation matrix from camera to ego.
+    #         trans(Tensor): Translation matrix from camera to ego.
+    #         intrins(Tensor): Intrinsic matrix.
+    #         post_rots_ida(Tensor): Rotation matrix for ida.
+    #         post_trans_ida(Tensor): Translation matrix for ida
+    #         post_rot_bda(Tensor): Rotation matrix for bda.
+
+    #     Returns:
+    #         Tensors: points ego coord.
+    #     """
+    #     batch_size, num_cams, _, _ = sensor2ego_mat.shape
+
+    #     # undo post-transformation
+    #     # B x N x D x H x W x 3
+    #     points = self.frustum
+    #     ida_mat = ida_mat.view(batch_size, num_cams, 1, 1, 1, 4, 4)
+    #     points = ida_mat.inverse().matmul(points.unsqueeze(-1))
+    #     # cam_to_ego
+    #     points = torch.cat(
+    #         (points[:, :, :, :, :, :2] * points[:, :, :, :, :, 2:3],
+    #          points[:, :, :, :, :, 2:]), 5)
+
+    #     combine = sensor2ego_mat.matmul(torch.inverse(intrin_mat))
+    #     points = combine.view(batch_size, num_cams, 1, 1, 1, 4,
+    #                           4).matmul(points)
+    #     if bda_mat is not None:
+    #         bda_mat = bda_mat.unsqueeze(1).repeat(1, num_cams, 1, 1).view(
+    #             batch_size, num_cams, 1, 1, 1, 4, 4)
+    #         points = (bda_mat @ points).squeeze(-1)
+    #     else:
+    #         points = points.squeeze(-1)
+    #     return points[..., :3]
+
     def get_geometry(self, sensor2ego_mat, intrin_mat, ida_mat, bda_mat):
         """Transfer points from camera coord to ego coord.
 
@@ -433,29 +470,38 @@ class BaseLSSFPN(nn.Module):
             post_rot_bda(Tensor): Rotation matrix for bda.
 
         Returns:
-            Tensors: points ego coord.
+            Tensors: points in ego coord.
         """
         batch_size, num_cams, _, _ = sensor2ego_mat.shape
+        device = sensor2ego_mat.device
 
-        # undo post-transformation
-        # B x N x D x H x W x 3
-        points = self.frustum
-        ida_mat = ida_mat.view(batch_size, num_cams, 1, 1, 1, 4, 4)
-        points = ida_mat.inverse().matmul(points.unsqueeze(-1))
-        # cam_to_ego
+        # Step 1: Frustum 생성
+        points = self.frustum  # (B x N x D x H x W x 3)
+
+        # Step 2: ida_mat inverse (on CPU)
+        ida_mat_cpu = ida_mat.view(batch_size, num_cams, 1, 1, 1, 4, 4).to("cpu")
+        ida_inv = ida_mat_cpu.inverse().to(device)  # Back to GPU
+        points = ida_inv.matmul(points.unsqueeze(-1))
+
+        # Step 3: normalize xy by depth
         points = torch.cat(
             (points[:, :, :, :, :, :2] * points[:, :, :, :, :, 2:3],
-             points[:, :, :, :, :, 2:]), 5)
+            points[:, :, :, :, :, 2:]), 5)
 
-        combine = sensor2ego_mat.matmul(torch.inverse(intrin_mat))
-        points = combine.view(batch_size, num_cams, 1, 1, 1, 4,
-                              4).matmul(points)
+        # Step 4: Combine camera intrinsics and extrinsics
+        intrin_inv = torch.inverse(intrin_mat.to("cpu")).to(device)
+        combine = sensor2ego_mat.matmul(intrin_inv)
+        combine = combine.view(batch_size, num_cams, 1, 1, 1, 4, 4)
+        points = combine.matmul(points)
+
+        # Step 5: Apply bda_mat if present
         if bda_mat is not None:
             bda_mat = bda_mat.unsqueeze(1).repeat(1, num_cams, 1, 1).view(
                 batch_size, num_cams, 1, 1, 1, 4, 4)
             points = (bda_mat @ points).squeeze(-1)
         else:
             points = points.squeeze(-1)
+
         return points[..., :3]
 
     def get_cam_feats(self, imgs):

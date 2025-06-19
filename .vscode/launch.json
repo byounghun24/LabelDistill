@@ -30,6 +30,7 @@
                 "-b", "1",
                 "--gpus", "1"
             ],
+            "justMyCode": false
         },
     ]
 }
