@@ -32,5 +32,21 @@
             ],
             "justMyCode": false
         },
+        {
+            "name": "train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/home/byounghun/LabelDistill/labeldistill/exps/nuscenes/labeldistill/LabelDistill_fusion_r50_128x128_e24_2key.py",
+            "cwd": "/home/byounghun/LabelDistill",
+            "console": "integratedTerminal",
+            "env" : {
+                    "CUDA_VISIBLE_DEVICES": "3"
+                },
+            "args": [
+                "--amp_backend", "native",
+                "-b", "1",
+                "--gpus", "1"
+            ],
+        },
     ]
 }

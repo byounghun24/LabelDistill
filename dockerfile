@@ -40,9 +40,9 @@ RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
     pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 \
     -f https://download.pytorch.org/whl/torch_stable.html
 
-# Clone LabelDistill repo
-RUN git clone https://github.com/byounghun24/LabelDistill.git
-WORKDIR /home/$USERNAME/LabelDistill
+# # Clone LabelDistill repo
+# RUN git clone https://github.com/byounghun24/LabelDistill.git
+# WORKDIR /home/$USERNAME/LabelDistill
 
 # Install mmcv, mmdet, mmseg
 RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
@@ -51,10 +51,10 @@ RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
     mim install mmdet==2.26.0 && \
     mim install mmsegmentation==0.29.1
 
-# Install mmdetection3d
-RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
-    git clone -b v1.0.0rc4 https://github.com/open-mmlab/mmdetection3d.git && \
-    cd mmdetection3d && pip install -e .
+# # Install mmdetection3d
+# RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
+#     git clone -b v1.0.0rc4 https://github.com/open-mmlab/mmdetection3d.git && \
+#     cd mmdetection3d && pip install -e .
 
 # Install pip
 RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
@@ -64,9 +64,11 @@ RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
 RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
     pip install wandb
 
-# Install project dependencies
-RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
-    pip install -r requirements.txt && \
-    python setup.py develop
+# # Install project dependencies
+# RUN source $CONDA_DIR/etc/profile.d/conda.sh && conda activate labeldistill && \
+#     pip install -r requirements.txt && \
+#     python setup.py develop
 
-CMD ["bash"]
+CMD ["/bin/bash", "-l"]
+SHELL ["/bin/bash", "-c"]
+
