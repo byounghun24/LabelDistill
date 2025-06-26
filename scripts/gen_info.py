@@ -5,8 +5,9 @@ from nuscenes.utils import splits
 from tqdm import tqdm
 
 
-def generate_info(nusc, scenes, max_cam_sweeps=6, max_lidar_sweeps=5):
+def generate_info(nusc, scenes, max_cam_sweeps=6, max_lidar_sweeps=5, max_samples=10000):
     infos = list()
+    sample_count = 0
     for cur_scene in tqdm(nusc.scene):
         if cur_scene['name'] not in scenes:
             continue
@@ -169,6 +170,13 @@ def generate_info(nusc, scenes, max_cam_sweeps=6, max_lidar_sweeps=5):
                     ann_infos.append(ann_info)
                 info['ann_infos'] = ann_infos
             infos.append(info)
+
+            sample_count += 1
+            
+            # sample 1개만 만들고 나가기
+            if sample_count >= max_samples:
+                return infos
+            
             if cur_sample['next'] == '':
                 break
             else:
@@ -183,10 +191,10 @@ def main():
     train_scenes = splits.train
     val_scenes = splits.val
     #######################################################################
-    train_infos = generate_info(trainval_nusc, train_scenes)
-    val_infos = generate_info(trainval_nusc, val_scenes)
-    mmcv.dump(train_infos, './data/nuScenes/nuscenes_infos_train.pkl')
-    mmcv.dump(val_infos, './data/nuScenes/nuscenes_infos_val.pkl')
+    train_infos = generate_info(trainval_nusc, train_scenes, max_samples=1)
+    val_infos = generate_info(trainval_nusc, val_scenes, max_samples=1)
+    mmcv.dump(train_infos, './data/nuScenes/nuscenes_infos_train_label_distill_single.pkl')
+    mmcv.dump(val_infos, './data/nuScenes/nuscenes_infos_val_label_distill_single.pkl')
     #######################################################################
 
 
