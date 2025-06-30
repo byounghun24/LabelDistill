@@ -40,11 +40,11 @@ def run_cli(model_class=LabelDistillModel,
                         strategy='ddp',
                         num_sanity_val_steps=0,
                         gradient_clip_val=5,
-                        limit_val_batches=1.00,
+                        limit_val_batches=0.00,
                         enable_checkpointing=True,
                         precision=16,
-                        default_root_dir=os.path.join('./outputs/', exp_name))
-                        # log_every_n_steps=1)
+                        default_root_dir=os.path.join('./outputs/', exp_name),
+                        log_every_n_steps=1)
     args = parser.parse_args()
     if args.seed is not None:
         pl.seed_everything(args.seed)
