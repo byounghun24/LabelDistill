@@ -87,7 +87,8 @@ class DetNuscEvaluator():
                         verbose=False)
         eval_set_map = {
             'v1.0-mini': 'mini_val',
-            'v1.0-trainval': 'val',
+            # 'v1.0-trainval': 'val',
+            'v1.0-trainval': 'train',
         }
         nusc_eval = NuScenesEval(nusc,
                                  config=self.eval_detection_configs,

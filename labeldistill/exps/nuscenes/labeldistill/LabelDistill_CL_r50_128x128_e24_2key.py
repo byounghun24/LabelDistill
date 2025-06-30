@@ -26,7 +26,7 @@ barrier                 0.579   0.410   0.262   0.125   nan     nan
 from labeldistill.exps.base_cli import run_cli
 from labeldistill.exps.nuscenes.base_exp import \
     LabelDistillModel as BaseLabelDistillModel
-from labeldistill.models.labeldistill import LabelDistill
+from labeldistill.models.labeldistill_CL import LabelDistill
 from torch.optim.lr_scheduler import MultiStepLR
 from mmcv.runner import build_optimizer
 from labeldistill.datasets.nusc_det_dataset_lidar import NuscDetDataset, collate_fn
@@ -234,13 +234,121 @@ class LabelDistillModel(BaseLabelDistillModel):
         lidar_distill_loss = self.get_feature_distill_loss(lidar_feats, distill_feats_lidar, targets[0], binary_mask=False) * 0.3
         label_distill_loss = self.get_feature_distill_loss(label_feats, distill_feats_label, targets[0], binary_mask=True) * 0.3
 
+        contrastive_loss = self.compute_contrastive_loss(
+            bev_box=bev_box,
+            bev_label=bev_label,
+            cam_feats_list=distill_feats_lidar,
+            lidar_feats_list=lidar_feats,
+        ) * 0.1
+
         self.log('detection_loss', detection_loss)
         self.log('response_loss', response_loss)
         self.log('depth_loss', depth_loss)
         self.log('lidar_distill_loss', lidar_distill_loss)
         self.log('label_distill_loss', label_distill_loss)
+        self.log('contrastive_loss', contrastive_loss)
 
-        return detection_loss + depth_loss + lidar_distill_loss + label_distill_loss + response_loss
+        return detection_loss + depth_loss + lidar_distill_loss + label_distill_loss + response_loss + contrastive_loss
+
+    def compute_contrastive_loss(
+        self,
+        bev_box,                 # (B, H, W, 9) - bbox info per pixel
+        bev_label,               # (B, H, W, C) - one-hot class label map
+        cam_feats_list,          # list[(B, C, H, W)] - camera BEV features
+        lidar_feats_list,        # list[(B, C, H, W)] - LiDAR BEV features
+        temperature=0.07,
+        eps=1e-8
+    ):
+        """Compute instance-level SupCon-style cross-modal contrastive loss between
+        camera and LiDAR features using bbox-based grouping.
+
+        Returns:
+            contrastive_loss: scalar tensor
+        """
+        num_classes = bev_label.shape[-1]
+        total_loss = 0.0
+        valid_instances = 0
+        B, H_full, W_full, _ = bev_label.shape
+
+        for cam_feats, lidar_feats in zip(cam_feats_list, lidar_feats_list):
+            B, C, H, W = cam_feats.shape
+
+            for b in range(B):
+                label_soft = F.interpolate(
+                    bev_label[b].permute(2, 0, 1).unsqueeze(0).float(),
+                    size=(H, W), mode='nearest'
+                )[0]  # (C, H, W)
+
+                bbox_map = F.interpolate(
+                    bev_box[b].permute(2, 0, 1).unsqueeze(0),
+                    size=(H, W), mode='nearest'
+                )[0].permute(1, 2, 0)  # (H, W, 9)
+
+                cam_feat = cam_feats[b].permute(1, 2, 0)    # (H, W, C)
+                lidar_feat = lidar_feats[b].permute(1, 2, 0)  # (H, W, C)
+
+                all_anchors = []
+                all_positives = []
+                all_labels = []
+
+                for class_id in range(num_classes):
+                    class_mask = (label_soft[class_id] > 0.5)  # (H, W)
+
+                    if class_mask.sum() < 1:
+                        continue
+
+                    boxes = bbox_map[class_mask]  # (N, 9)
+                    feats_cam = cam_feat[class_mask]  # (N, C)
+                    feats_lidar = lidar_feat[class_mask]  # (N, C)
+
+                    unique_boxes, inverse_indices = torch.unique(boxes, dim=0, return_inverse=True)
+
+                    for box_idx in range(unique_boxes.shape[0]):
+                        instance_mask = (inverse_indices == box_idx)
+                        if instance_mask.sum() < 2:
+                            continue
+
+                        cam_inst_feat = feats_cam[instance_mask]
+                        lidar_inst_feat = feats_lidar[instance_mask]
+
+                        cam_mean = cam_inst_feat.mean(dim=0, keepdim=True)  # (1, C)
+                        lidar_mean = lidar_inst_feat.mean(dim=0, keepdim=True)  # (1, C)
+
+                        all_anchors.append(cam_mean)
+                        all_positives.append(lidar_mean)
+                        all_labels.append(class_id)
+
+                if len(all_anchors) < 2:
+                    continue
+
+                anchors = torch.cat(all_anchors, dim=0)  # (N, C)
+                positives = torch.cat(all_positives, dim=0)  # (N, C)
+                labels = torch.tensor(all_labels, device=anchors.device)
+
+                features = torch.cat([anchors, positives], dim=0)  # (2N, C)
+                features = F.normalize(features, dim=1)
+                labels = torch.cat([labels, labels], dim=0)
+
+                logits = torch.matmul(features, features.T) / temperature  # (2N, 2N)
+                logits_max, _ = logits.max(dim=1, keepdim=True)
+                logits = logits - logits_max.detach()
+
+                mask = torch.eq(labels.unsqueeze(0), labels.unsqueeze(1)).float()
+                logits_mask = torch.ones_like(mask) - torch.eye(mask.shape[0], device=mask.device)
+                mask = mask * logits_mask
+
+                exp_logits = torch.exp(logits) * logits_mask
+                log_prob = logits - torch.log(exp_logits.sum(dim=1, keepdim=True) + eps)
+
+                mean_log_prob_pos = (mask * log_prob).sum(dim=1) / (mask.sum(dim=1) + eps)
+                loss = -mean_log_prob_pos.mean()
+
+                total_loss += loss
+                valid_instances += 1
+
+        if valid_instances == 0:
+            return torch.tensor(0.0, requires_grad=True, device=bev_label.device)
+        return total_loss / valid_instances
 
     def get_feature_distill_loss(self, lidar_feat, distill_feats, bev_mask=None, binary_mask=False):
 

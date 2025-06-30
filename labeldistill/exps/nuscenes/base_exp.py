@@ -232,7 +232,7 @@ class LabelDistillModel(LightningModule):
         self.train_info_paths = os.path.join(self.data_root,
                                              'nuscenes_infos_train_label_distill_single.pkl')
         self.val_info_paths = os.path.join(self.data_root,
-                                           'nuscenes_infos_val_label_distill_single.pkl')
+                                           'nuscenes_infos_train_label_distill_single.pkl')
         self.predict_info_paths = os.path.join(self.data_root,
                                                'nuscenes_infos_test.pkl')
 

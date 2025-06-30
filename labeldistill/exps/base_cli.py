@@ -44,6 +44,7 @@ def run_cli(model_class=LabelDistillModel,
                         enable_checkpointing=True,
                         precision=16,
                         default_root_dir=os.path.join('./outputs/', exp_name))
+                        # log_every_n_steps=1)
     args = parser.parse_args()
     if args.seed is not None:
         pl.seed_everything(args.seed)
@@ -51,7 +52,7 @@ def run_cli(model_class=LabelDistillModel,
     now = datetime.now()
     current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     wandb_logger = WandbLogger(
-        name='debug_' + exp_name + '_' + current_time,
+        name='CL_debug_' + exp_name + '_' + current_time,
         project="LabelDistill",
         save_dir=os.path.join('./outputs/', exp_name),
         log_model=True
