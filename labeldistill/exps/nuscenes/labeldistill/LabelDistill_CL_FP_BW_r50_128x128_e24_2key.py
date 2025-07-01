@@ -36,6 +36,26 @@ import torch
 import torch.nn.functional as F
 import os
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+import wandb
+
+def plot_anchor_positive_similarity(sim_matrix, anchor_labels, positive_labels, max_points=64):
+    Na = min(len(anchor_labels), max_points)
+    Np = min(len(positive_labels), max_points)
+    sim_matrix = sim_matrix[:Na, :Np]
+    anchor_labels = anchor_labels[:Na]
+    positive_labels = positive_labels[:Np]
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(sim_matrix, xticklabels=positive_labels, yticklabels=anchor_labels,
+                cmap='coolwarm', square=True, cbar=True, ax=ax)
+    ax.set_title("Anchor vs Positive Similarity")
+    ax.set_xlabel("Positive Features (class)")
+    ax.set_ylabel("Anchor Features (class)")
+    plt.tight_layout()
+    return fig
 
 class LabelDistillModel(BaseLabelDistillModel):
 
@@ -239,7 +259,7 @@ class LabelDistillModel(BaseLabelDistillModel):
             bev_label=bev_label,
             cam_feats_list=distill_feats_lidar,
             lidar_feats_list=lidar_feats,
-        ) * 2
+        ) * 200
 
         self.log('detection_loss', detection_loss)
         self.log('response_loss', response_loss)
@@ -248,7 +268,7 @@ class LabelDistillModel(BaseLabelDistillModel):
         self.log('label_distill_loss', label_distill_loss)
         self.log('contrastive_loss', contrastive_loss)
 
-        return detection_loss + depth_loss + lidar_distill_loss + label_distill_loss + response_loss + contrastive_loss
+        return detection_loss + depth_loss + label_distill_loss + response_loss + contrastive_loss
 
     # def compute_contrastive_loss(
     #     self,
@@ -432,19 +452,40 @@ class LabelDistillModel(BaseLabelDistillModel):
             positives = torch.cat(all_positives, dim=0)       # (Np, C)
             positive_labels = torch.tensor(all_positive_labels, device=positives.device)  # (Np,)
 
-            features = torch.cat([anchors, positives], dim=0)     # (Na + Np, C)
-            features = F.normalize(features, dim=1)
-            labels = torch.cat([anchor_labels, positive_labels], dim=0)  # (Na + Np,)
+            anchors = F.normalize(anchors, dim=1)
+            positives = F.normalize(positives, dim=1)
 
-            logits = torch.matmul(features, features.T) / temperature
+            cos_sim = torch.matmul(anchors, positives.T)
+
+            ################# Visualize cosine similarity matrix ###################
+            classes_vis = ['car', 'truck', 'construction_vehicle', 'bus', 'trailer', 'barrier', 'motorcycle', 'bicycle', 'pedestrian', 'traffic_cone']
+            cos_sim_np = cos_sim.detach().cpu().numpy()
+
+            anchor_labels_np = anchor_labels.detach().cpu().numpy()  # (Na,)
+            positive_labels_np = positive_labels.detach().cpu().numpy()  # (Np,)
+
+            anchor_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(anchor_labels_np)]
+            positive_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(positive_labels_np)]
+
+            fig, ax = plt.subplots(figsize=(10, 8))
+            sns.heatmap(cos_sim_np, xticklabels=positive_ids, yticklabels=anchor_ids,
+                        cmap="viridis", vmin=-1, vmax=1, ax=ax)
+            ax.set_xlabel("LiDAR_feat (class:idx)")
+            ax.set_ylabel("Camera_feat (class:idx)")
+            ax.set_title("Camera_feat vs LiDAR_feat Cosine Similarity")
+
+            wandb.log({"cosine_similarity_heatmap": wandb.Image(fig)})
+            plt.close(fig)
+            ##########################################################################
+
+            logits = cos_sim / temperature  # (Na, Np)
             logits_max, _ = logits.max(dim=1, keepdim=True)
             logits = logits - logits_max.detach()
 
-            mask = torch.eq(labels.unsqueeze(0), labels.unsqueeze(1)).float()
-            logits_mask = torch.ones_like(mask) - torch.eye(mask.shape[0], device=mask.device)
-            mask *= logits_mask
+            # Mask: (Na, Np) where [i,j] = 1 if labels match
+            mask = (anchor_labels.unsqueeze(1) == positive_labels.unsqueeze(0)).float()
 
-            exp_logits = torch.exp(logits) * logits_mask
+            exp_logits = torch.exp(logits)
             log_prob = logits - torch.log(exp_logits.sum(dim=1, keepdim=True) + eps)
 
             mean_log_prob_pos = (mask * log_prob).sum(dim=1) / (mask.sum(dim=1) + eps)
@@ -453,10 +494,17 @@ class LabelDistillModel(BaseLabelDistillModel):
             total_loss += loss
             valid_batches += 1
 
+            # sim_matrix_ap_np = logits.detach().cpu().numpy()
+            # anchor_labels_np = anchor_labels.detach().cpu().numpy()
+            # positive_labels_np = positive_labels.detach().cpu().numpy()
+            # fig_ap = plot_anchor_positive_similarity(sim_matrix_ap_np, anchor_labels_np, positive_labels_np, max_points=64)
+            # wandb.log({f"anchor_positive_similarity/batch_{valid_batches}": wandb.Image(fig_ap)})
+            # plt.close(fig_ap)
+
         if valid_batches == 0:
             return torch.tensor(0.0, requires_grad=True, device=bev_label.device)
         return total_loss / valid_batches
-        
+
     def get_feature_distill_loss(self, lidar_feat, distill_feats, bev_mask=None, binary_mask=False):
 
         label_losses = 0
@@ -521,6 +569,8 @@ class LabelDistillModel(BaseLabelDistillModel):
                                        return_depth=self.data_return_depth,
                                        return_lidar=self.data_return_lidar,
                                        use_fusion=self.use_fusion)
+
+        print(train_dataset.classes)
 
         train_loader = torch.utils.data.DataLoader(
             train_dataset,
