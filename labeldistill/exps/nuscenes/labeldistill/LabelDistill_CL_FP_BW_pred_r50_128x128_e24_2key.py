@@ -42,6 +42,7 @@ import numpy as np
 import wandb
 from torchvision.ops import roi_align
 import torch.nn as nn
+from mmdet3d.core.bbox.iou_calculators import bbox_overlaps_3d
 
 def plot_anchor_positive_similarity(sim_matrix, anchor_labels, positive_labels, max_points=64):
     Na = min(len(anchor_labels), max_points)
@@ -252,7 +253,7 @@ class LabelDistillModel(BaseLabelDistillModel):
         ################################################################################################
 
     def training_step(self, batch):
-        (sweep_imgs, mats, _, _, gt_boxes, gt_labels, lidar_pts, depth_labels) = batch
+        (sweep_imgs, mats, _, img_metas, gt_boxes, gt_labels, lidar_pts, depth_labels) = batch
         if torch.cuda.is_available():
             for key, value in mats.items():
                 mats[key] = value.cuda()
@@ -278,6 +279,8 @@ class LabelDistillModel(BaseLabelDistillModel):
         else:
             detection_loss, response_loss = self.model.response_loss(targets, preds, lidar_preds)
 
+        results, lidar_results = self.compute_contrastive_pairs(preds, lidar_preds, img_metas, gt_boxes)
+
         if len(depth_labels.shape) == 5:
             # only key-frame will calculate depth loss
             depth_labels = depth_labels[:, 0, ...]
@@ -287,7 +290,7 @@ class LabelDistillModel(BaseLabelDistillModel):
 
         contrastive_loss = self.compute_contrastive_loss(
             bev_box, bev_label, distill_feats_lidar, lidar_feats,
-            gt_boxes, gt_labels
+            results, lidar_results
         ) * 200
 
         self.log('detection_loss', detection_loss)
@@ -299,14 +302,88 @@ class LabelDistillModel(BaseLabelDistillModel):
 
         return detection_loss + depth_loss + label_distill_loss + response_loss + contrastive_loss
 
+    def compute_contrastive_pairs(self, preds, lidar_preds, img_metas, gt_boxes_list, iou_thresh=0.5, score_thresh=0.3):
+        if isinstance(self.model, torch.nn.parallel.DistributedDataParallel):
+            results = self.model.module.get_bboxes(preds, img_metas)              # camera
+            lidar_results = self.model.module.get_bboxes(lidar_preds, img_metas)  # lidar
+        else:
+            results = self.model.get_bboxes(preds, img_metas)
+            lidar_results = self.model.get_bboxes(lidar_preds, img_metas)
+
+        camera_filtered_list = []
+        lidar_filtered_list = []
+
+        for b, (cam_res, lidar_res, gt_boxes) in enumerate(zip(results, lidar_results, gt_boxes_list)):
+            # camera
+            cam_boxes, cam_scores, _ = cam_res  # label은 폐기
+            # lidar
+            lidar_boxes_full, lidar_scores, lidar_labels = lidar_res
+
+            # (1) Lidar filtering: GT와 IoU > threshold
+            lidar_boxes_iou = lidar_boxes_full[:, :7]
+            gt_boxes_iou = gt_boxes[:, :7].to(lidar_boxes_iou.device)
+
+            ious = bbox_overlaps_3d(lidar_boxes_iou, gt_boxes_iou)  # (N_lidar, N_gt)
+            max_ious, _ = ious.max(dim=1)
+            valid_mask = max_ious > iou_thresh
+
+            lidar_boxes_filtered = lidar_boxes_full[valid_mask]
+            lidar_scores_filtered = lidar_scores[valid_mask]
+            lidar_labels_filtered = lidar_labels[valid_mask]
+
+            num_valid = lidar_boxes_filtered.shape[0]
+
+            # (2) Camera filtering: match with filtered lidar using IoU + confidence
+            if num_valid > 0 and cam_boxes.shape[0] > 0:
+                lidar_boxes_for_iou = lidar_boxes_filtered[:, :7]
+                cam_boxes_for_iou = cam_boxes[:, :7]
+
+                ious_lidar_to_cam = bbox_overlaps_3d(lidar_boxes_for_iou, cam_boxes_for_iou)  # (M, N)
+                matched_cam_idxs = ious_lidar_to_cam.argmax(dim=1)                            # (M,)
+                max_ious_per_lidar = ious_lidar_to_cam.max(dim=1).values
+                cam_scores_matched = cam_scores[matched_cam_idxs]
+
+                valid_score_mask = (max_ious_per_lidar > 0) & (cam_scores_matched > score_thresh)
+
+                final_lidar_idxs = valid_score_mask.nonzero(as_tuple=True)[0]
+                final_cam_idxs = matched_cam_idxs[valid_score_mask]
+
+                if final_cam_idxs.numel() > 0:
+                    # 중복 camera box 제거 & 매칭된 lidar label 선택
+                    unique_cam_idxs, inverse_map = torch.unique(final_cam_idxs, return_inverse=True)
+                    candidate_labels = lidar_labels_filtered[final_lidar_idxs]
+
+                    selected_labels = []
+                    for u in range(len(unique_cam_idxs)):
+                        first_match_idx = (inverse_map == u).nonzero(as_tuple=True)[0][0]
+                        selected_labels.append(candidate_labels[first_match_idx].item())
+
+                    cam_boxes_filtered = cam_boxes[unique_cam_idxs]
+                    cam_scores_filtered = cam_scores[unique_cam_idxs]
+                    cam_labels_filtered = torch.tensor(selected_labels, dtype=torch.long, device=cam_boxes.device)
+                else:
+                    cam_boxes_filtered = cam_boxes[:0]
+                    cam_scores_filtered = cam_scores[:0]
+                    cam_labels_filtered = cam_scores[:0].long()
+            else:
+                cam_boxes_filtered = cam_boxes[:0]
+                cam_scores_filtered = cam_scores[:0]
+                cam_labels_filtered = cam_scores[:0].long()
+
+            # Append per batch
+            lidar_filtered_list.append((lidar_boxes_filtered, lidar_scores_filtered, lidar_labels_filtered))
+            camera_filtered_list.append((cam_boxes_filtered, cam_scores_filtered, cam_labels_filtered))
+
+        return camera_filtered_list, lidar_filtered_list
+
     def compute_contrastive_loss(
         self,
-        bev_box,                 # (B, H, W, 9)
-        bev_label,               # (B, H, W, C)
-        cam_feats_list,          # list[(B, C_i, H, W)]
-        lidar_feats_list,        # list[(B, C_i, H, W)]
-        gt_boxes_list,           # list of length B, each Tensor[N_i, 9]
-        gt_labels_list,          # list of length B, each Tensor[N_i]
+        bev_box,                # (B, H, W, 9)
+        bev_label,              # (B, H, W, C)
+        cam_feats_list,         # list[(B, C_i, H, W)]
+        lidar_feats_list,       # list[(B, C_i, H, W)]
+        results,                # camera_filtered_list ([(boxes, scores, labels), ...])
+        lidar_results,          # lidar_filtered_list ([(boxes, scores, labels), ...])
         temperature=0.07,
         eps=1e-8
     ):
@@ -314,7 +391,6 @@ class LabelDistillModel(BaseLabelDistillModel):
         total_loss = 0.0
         valid_batches = 0
 
-        # 각 feature level 별로
         for level, (cam_feats, lidar_feats) in enumerate(zip(cam_feats_list, lidar_feats_list)):
             B, C, H, W = cam_feats.shape
             cam_proj = self.cam_proj_heads[level]
@@ -324,64 +400,82 @@ class LabelDistillModel(BaseLabelDistillModel):
             positives, positive_labels = [], []
 
             for b in range(B):
-                gt_boxes = gt_boxes_list[b]    # Tensor[N_i, 9]
-                gt_labels = gt_labels_list[b]  # Tensor[N_i]
+                cam_boxes, _, cam_labels = results[b]
+                lidar_boxes, _, lidar_labels = lidar_results[b]
 
-                # BEV feature map과 GT 좌표계 매핑을 위한 scale 계산
-                # 예시: bev coord (meters) -> feature pixel
-                # x_pix = (box_x - x_min) / (x_max - x_min) * W
-                # y_pix = (box_y - y_min) / (y_max - y_min) * H
-                for i, box in enumerate(gt_boxes):
-                    cls_id = int(gt_labels[i])
+                # 배치 인덱스가 같이 들어가야 하므로
+                def box_to_roi(boxes):
+                    rois = []
+                    for box in boxes:
+                        cx, cy, _, dx, dy, _, *_ = box.tolist()
+                        x1 = (cx - dx / 2 - self.pc_range[0]) / (self.pc_range[3] - self.pc_range[0]) * W
+                        y1 = (cy - dy / 2 - self.pc_range[1]) / (self.pc_range[4] - self.pc_range[1]) * H
+                        x2 = (cx + dx / 2 - self.pc_range[0]) / (self.pc_range[3] - self.pc_range[0]) * W
+                        y2 = (cy + dy / 2 - self.pc_range[1]) / (self.pc_range[4] - self.pc_range[1]) * H
+                        x1, y1 = max(0, x1), max(0, y1)
+                        x2, y2 = min(W - 1, x2), min(H - 1, y2)
+                        rois.append([0, x1, y1, x2, y2])
+                    return torch.tensor(rois, dtype=torch.float, device=cam_feats.device)
 
-                    # box의 BEV 중심과 크기
-                    cx, cy, cz, dx, dy, dz, yaw, *rest = box.tolist()
-                    # box corners (단순화): left-top, right-bottom 픽셀 좌표
-                    # 실제로는 box 중심과 extents로 계산
-                    x1 = (cx - dx/2 - self.pc_range[0]) / (self.pc_range[3] - self.pc_range[0]) * W
-                    y1 = (cy - dy/2 - self.pc_range[1]) / (self.pc_range[4] - self.pc_range[1]) * H
-                    x2 = (cx + dx/2 - self.pc_range[0]) / (self.pc_range[3] - self.pc_range[0]) * W
-                    y2 = (cy + dy/2 - self.pc_range[1]) / (self.pc_range[4] - self.pc_range[1]) * H
+                if cam_boxes.shape[0] > 0 and lidar_boxes.shape[0] > 0:
+                    cam_rois = box_to_roi(cam_boxes)
+                    lidar_rois = box_to_roi(lidar_boxes)
 
-                    # 경계 clamp
-                    x1, y1 = max(0, x1), max(0, y1)
-                    x2, y2 = min(W-1, x2), min(H-1, y2)
+                    cam_roi_feats = roi_align(cam_feats[b:b+1], cam_rois, output_size=(self.proj_input_size, self.proj_input_size), aligned=True)
+                    lidar_roi_feats = roi_align(lidar_feats[b:b+1], lidar_rois, output_size=(self.proj_input_size, self.proj_input_size), aligned=True)
 
-                    # ROIAlign 수행
-                    rois = torch.tensor([[0, x1, y1, x2, y2]], device=cam_feats.device)
-                    cam_roi = roi_align(cam_feats[b:b+1], rois, output_size=(self.proj_input_size,self.proj_input_size), aligned=True)
-                    lidar_roi = roi_align(lidar_feats[b:b+1], rois, output_size=(self.proj_input_size,self.proj_input_size), aligned=True)
+                    cam_flat = F.normalize(cam_roi_feats.view(cam_roi_feats.size(0), -1), dim=1)
+                    lidar_flat = F.normalize(lidar_roi_feats.view(lidar_roi_feats.size(0), -1), dim=1)
 
-                    # flatten & normalize
-                    cam_flat = F.normalize(cam_roi.reshape(1, -1), dim=1)
-                    lidar_flat = F.normalize(lidar_roi.reshape(1, -1), dim=1)
+                    cam_vecs = cam_proj(cam_flat)
+                    lidar_vecs = lidar_proj(lidar_flat)
 
-                    # projection
-                    cam_vec = cam_proj(cam_flat)
-                    lidar_vec = lidar_proj(lidar_flat)
-
-                    anchors.append(cam_vec)
-                    anchor_labels.append(cls_id)
-                    positives.append(lidar_vec)
-                    positive_labels.append(cls_id)
+                    anchors.append(cam_vecs)
+                    anchor_labels.append(cam_labels)
+                    positives.append(lidar_vecs)
+                    positive_labels.append(lidar_labels)
 
             if not anchors:
                 continue
 
             anchors = torch.cat(anchors, dim=0)
             positives = torch.cat(positives, dim=0)
-            anchor_labels = torch.tensor(anchor_labels, device=anchors.device)
-            positive_labels = torch.tensor(positive_labels, device=positives.device)
+            anchor_labels = torch.cat(anchor_labels, dim=0)
+            positive_labels = torch.cat(positive_labels, dim=0)
 
-            # normalize similarity
+            # normalize for cosine similarity
             anchors = F.normalize(anchors, dim=1)
             positives = F.normalize(positives, dim=1)
-            cos_sim = anchors @ positives.T   # (Na, Np)
 
-            cos_sim = cos_sim / temperature  # Scale by temperature
+            cos_sim = anchors @ positives.T  # (Na, Np)
+
+            ################# Visualize cosine similarity matrix ###################
+            classes_vis = ['car', 'truck', 'construction_vehicle', 'bus', 'trailer', 'barrier', 'motorcycle', 'bicycle', 'pedestrian', 'traffic_cone']
+            cos_sim_np = cos_sim.detach().cpu().numpy()
+
+            anchor_labels_np = anchor_labels.detach().cpu().numpy()  # (Na,)
+            positive_labels_np = positive_labels.detach().cpu().numpy()  # (Np,)
+
+            anchor_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(anchor_labels_np)]
+            positive_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(positive_labels_np)]
+
+            fig, ax = plt.subplots(figsize=(10, 8))
+            sns.heatmap(cos_sim_np, xticklabels=positive_ids, yticklabels=anchor_ids,
+                        cmap="viridis", vmin=-1, vmax=1, ax=ax)
+            ax.set_xlabel("LiDAR_feat (class:idx)")
+            ax.set_ylabel("Camera_feat (class:idx)")
+            ax.set_title("Camera_feat vs LiDAR_feat Cosine Similarity")
+
+            wandb.log({"cosine_similarity_heatmap": wandb.Image(fig)})
+            plt.close(fig)
+            ##########################################################################
+
+            cos_sim = cos_sim / temperature
             logits = cos_sim - cos_sim.max(dim=1, keepdim=True).values.detach()
 
+            # same class label → positive
             mask = (anchor_labels.unsqueeze(1) == positive_labels.unsqueeze(0)).float()
+
             exp_logits = torch.exp(logits)
             log_prob = logits - torch.log(exp_logits.sum(dim=1, keepdim=True) + eps)
             mean_log_prob_pos = (mask * log_prob).sum(dim=1) / (mask.sum(dim=1) + eps)
@@ -484,5 +578,5 @@ class LabelDistillModel(BaseLabelDistillModel):
 if __name__ == '__main__':
     run_cli(LabelDistillModel,
             'LiDARandLabelDistill_r50_128x128_e24_2key',
-            extra_trainer_config_args={'epochs': 24},
+            extra_trainer_config_args={'epochs': 50},
             use_ema=True)

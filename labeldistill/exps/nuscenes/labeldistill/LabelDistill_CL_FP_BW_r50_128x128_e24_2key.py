@@ -421,7 +421,7 @@ class LabelDistillModel(BaseLabelDistillModel):
                 lidar_feat = lidar_feats[b].permute(1, 2, 0)  # (H, W, C)
 
                 for class_id in range(num_classes):
-                    class_mask = (label_soft[class_id] > 0.5)
+                    class_mask = (label_soft[class_id] > 0)
                     if class_mask.sum() < 1:
                         continue
 
@@ -457,26 +457,26 @@ class LabelDistillModel(BaseLabelDistillModel):
 
             cos_sim = torch.matmul(anchors, positives.T)
 
-            ################# Visualize cosine similarity matrix ###################
-            classes_vis = ['car', 'truck', 'construction_vehicle', 'bus', 'trailer', 'barrier', 'motorcycle', 'bicycle', 'pedestrian', 'traffic_cone']
-            cos_sim_np = cos_sim.detach().cpu().numpy()
+            # ################# Visualize cosine similarity matrix ###################
+            # classes_vis = ['car', 'truck', 'construction_vehicle', 'bus', 'trailer', 'barrier', 'motorcycle', 'bicycle', 'pedestrian', 'traffic_cone']
+            # cos_sim_np = cos_sim.detach().cpu().numpy()
 
-            anchor_labels_np = anchor_labels.detach().cpu().numpy()  # (Na,)
-            positive_labels_np = positive_labels.detach().cpu().numpy()  # (Np,)
+            # anchor_labels_np = anchor_labels.detach().cpu().numpy()  # (Na,)
+            # positive_labels_np = positive_labels.detach().cpu().numpy()  # (Np,)
 
-            anchor_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(anchor_labels_np)]
-            positive_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(positive_labels_np)]
+            # anchor_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(anchor_labels_np)]
+            # positive_ids = [f"{classes_vis[cls]}:{i}" for i, cls in enumerate(positive_labels_np)]
 
-            fig, ax = plt.subplots(figsize=(10, 8))
-            sns.heatmap(cos_sim_np, xticklabels=positive_ids, yticklabels=anchor_ids,
-                        cmap="viridis", vmin=-1, vmax=1, ax=ax)
-            ax.set_xlabel("LiDAR_feat (class:idx)")
-            ax.set_ylabel("Camera_feat (class:idx)")
-            ax.set_title("Camera_feat vs LiDAR_feat Cosine Similarity")
+            # fig, ax = plt.subplots(figsize=(10, 8))
+            # sns.heatmap(cos_sim_np, xticklabels=positive_ids, yticklabels=anchor_ids,
+            #             cmap="viridis", vmin=-1, vmax=1, ax=ax)
+            # ax.set_xlabel("LiDAR_feat (class:idx)")
+            # ax.set_ylabel("Camera_feat (class:idx)")
+            # ax.set_title("Camera_feat vs LiDAR_feat Cosine Similarity")
 
-            wandb.log({"cosine_similarity_heatmap": wandb.Image(fig)})
-            plt.close(fig)
-            ##########################################################################
+            # wandb.log({"cosine_similarity_heatmap": wandb.Image(fig)})
+            # plt.close(fig)
+            # ##########################################################################
 
             logits = cos_sim / temperature  # (Na, Np)
             logits_max, _ = logits.max(dim=1, keepdim=True)
