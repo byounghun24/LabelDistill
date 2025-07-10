@@ -578,5 +578,5 @@ class LabelDistillModel(BaseLabelDistillModel):
 if __name__ == '__main__':
     run_cli(LabelDistillModel,
             'LiDARandLabelDistill_r50_128x128_e24_2key',
-            extra_trainer_config_args={'epochs': 50},
+            extra_trainer_config_args={'epochs': 24},
             use_ema=True)
